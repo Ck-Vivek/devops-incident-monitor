@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: devops-monitoring-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: incident_admin
+      POSTGRES_PASSWORD: incident_password
+      POSTGRES_DB: incident_monitor
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/migrations/001_create_users.sql:/docker-entrypoint-initdb.d/001_create_users.sql:ro
+
+volumes:
+  postgres_data:

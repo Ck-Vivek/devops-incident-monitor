@@ -1,18 +1,25 @@
 const express = require("express");
-
+const pool = require("./config/database");
+const authRoutes = require("./routes/auth.routes");
+const authenticateToken = require("./middleware/auth.middleware");
+const serviceRoutes = require("./routes/service.router");
 const app = express();
 app.use(express.json());
+app.use("/api/auth", authRoutes);
+app.use("/api/services", serviceRoutes);
 
 const PORT = 5000;
-
-app.get("/", (req, res) => {
-  res.send("DevOps monitoring server is running");
+pool.query("SELECT NOW()", (error, result) => {
+  if (error) {
+    console.error("Database connection failed:", error);
+  } else {
+    console.log("Database connected successfully:", result.rows[0]);
+  }
 });
-app.post("/test", (req, res) => {
-  console.log(req.body);
+app.get("/api/protected", authenticateToken, (req, res) => {
   res.status(200).json({
-    message: "Data received successfully",
-    data:req.body
+    message: "You accessed a protected route",
+    user: req.user,
   });
 });
 
